@@ -1,5 +1,6 @@
 import * as THREE from './build/three.module.js';
 import { FlyControls } from './jsm/controls/FlyControls.js';
+import { Lensflare, LensflareElement } from './jsm/objects/Lensflare.js';
 
 const windouWD = window.innerWidth;
 const windouHT = window.innerHeight;
@@ -20,7 +21,7 @@ const renderer = new THREE.WebGLRenderer();
 //コントロール
 const controls = new FlyControls(camera, renderer.domElement);
 controls.movementSpeed = 2500;
-controls.rollSpeed = Math.PI / 90;
+controls.rollSpeed = Math.PI / 180;
 
 const animate = () => {
 	requestAnimationFrame(animate);
@@ -61,11 +62,21 @@ const init = () => {
 		light.color.setHSL(h, s, l);
 		light.position.set(x, y, z);
 		scene.add(light);
+
+		//レンズフレア
+		const textureLoader = new THREE.TextureLoader();
+		const textureFlare = textureLoader.load('./textures/LensFlare.png');
+		const lensflare = new Lensflare();
+		lensflare.addElement(
+			new LensflareElement(textureFlare, 700, 0, light.color)
+		);
+		scene.add(lensflare);
 	};
 	addLight(0.08, 0.3, 0.9, 0, 0, -1000);
 
 	//レンダラー
 	renderer.setSize(windouWD, windouHT);
+	renderer.outputEncoding = THREE.sRGBEncoding;
 	document.body.appendChild(renderer.domElement);
 	renderer.render(scene, camera);
 
